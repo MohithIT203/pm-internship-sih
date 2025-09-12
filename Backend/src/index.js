@@ -5,6 +5,7 @@ require('dotenv').config();
 const PORT = process.env.PORT||5000;
 
 const register = require('../Routes/register');
+const internship = require('../Routes/internship');
 const app = express();
 
 app.use(express.json());
@@ -19,7 +20,7 @@ mongoose.connect(process.env.MONGO_URI)
     console.log("Error Connecting with Database");
 })
 app.use(register);
-
+app.use(internship);
 app.listen(PORT, () => {
     console.log(`Running on Port ${PORT}`);
 })

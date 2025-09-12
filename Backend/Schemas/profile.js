@@ -6,9 +6,31 @@ const profileSchema = new mongoose.Schema({
     ref: "Users",
     required: true,
   },
-  Name: { type: String },
-  
-  
+  Education: { type: String, required: true },
+  Skills: {
+    type: Array,
+    default: [],
+  },
+  Languages: {
+    type: Array,
+    default: [],
+  },
+  Preferred_type: {
+    type: String,
+    required: true,
+  },
+  Preferred_location: {
+    type: String,
+    required: true,
+  },
+  percent_10: {
+    type: Number,
+    required: true,
+  },
+  percent_12: {
+    type: Number,
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("Profile", profileSchema);
