@@ -1,7 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors=require('cors');
+require('dotenv').config();
 const PORT = process.env.PORT||5000;
+
 const register = require('../Routes/register');
 const app = express();
 
@@ -9,7 +11,7 @@ app.use(express.json());
 app.use(cors({origin:"*",credential:true}));
 
 
-mongoose.connect("mongodb+srv://mohith:100406@cluster-1.suxc7ye.mongodb.net/pm-internship-sih")
+mongoose.connect(process.env.MONGO_URI)
 .then(()=>{
     console.log("Connected to Database")
 })
