@@ -1,10 +1,4 @@
 /* Background */
-body {
-  margin: 0;
-  padding: 0;
-  background-color: #e6f2ff;
-  font-family: Arial, sans-serif;
-}
 
 .signin-container {
   min-height: 100vh;
@@ -14,7 +8,6 @@ body {
   justify-content: center;
   background-color: #e6f2ff;
   color: #000000 !important;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Header */
