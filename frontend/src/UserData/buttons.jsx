@@ -4,12 +4,14 @@ import React from 'react'
 export default function Buttons({pointer, setPointer, handleSubmit}) {
   return (
     <div className="flex gap-[15px] justify-end">
+
+      {pointer != 0 &&
         <Button
-          variant="contained"
-          sx={{
-            padding: "10px 40px",
-            borderRadius: "12px",
-            backgroundColor: "#5978FF",
+        variant="contained"
+        sx={{
+          padding: "10px 40px",
+          borderRadius: "12px",
+          backgroundColor: "#5978FF",
             color: "white",
             fontSize: "16px",
             fontWeight: 600,
@@ -18,12 +20,13 @@ export default function Buttons({pointer, setPointer, handleSubmit}) {
           }}
           onClick={() => setPointer(pointer > 2 ? pointer - 2 : pointer -1)}
           
-        >
+          >
           Back
         </Button>
+  }
 
         <Button
-          variant="contained"
+        variant="contained"
           sx={{
             padding: "10px 40px",
             borderRadius: "12px",

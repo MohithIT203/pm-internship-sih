@@ -1,37 +1,119 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
   TextField,
   MenuItem,
-  Button,
+  Autocomplete,
+  Chip,
 } from "@mui/material";
 import Buttons from "./buttons";
 
-const internshipTypes = ["Full-time", "Part-time", "Remote", "On-site", "Hybrid"];
-const locations = [
-  "Coimbatore","Bangalore", "Chennai", "Delhi", "Hyderabad",
-  "Mumbai", "Pune", "Kolkata", "Remote"
-];
+// Utility to normalize and remove diacritics
+function normalizeText(str) {
+  if (typeof str !== "string") return "";
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
 
-export default function InternshipDetails({ pointer, setPointer }) {
-  const [internshipType, setInternshipType] = useState("");
-  const [location, setLocation] = useState("");
-  const [errors, setErrors] = useState({ internshipType: false, location: false });
+// Utility to deduplicate array and remove falsy values
+function uniqueArray(arr) {
+  return [...new Set((arr || []).filter(Boolean))];
+}
+
+export default function Preference({ pointer, setPointer }) {
+  const [sector, setSector] = useState("");
+  const [sectors, setSectors] = useState([]);
+  const [states, setStates] = useState([]);
+  const [selectedState, setSelectedState] = useState(null);
+  const [districts, setDistricts] = useState([]);
+  const [selectedDistricts, setSelectedDistricts] = useState([]);
+  const [errors, setErrors] = useState({
+    sector: false,
+    state: false,
+    districts: false,
+  });
+
+  // Fetch sectors on mount
+  useEffect(() => {
+    async function fetchSectors() {
+      try {
+        // Using a static array for demonstration (you can replace with a working API)
+        const sectorNames = ["IT", "Marketing", "Electronics", "Healthcare", "Finance"];
+        setSectors(uniqueArray(sectorNames));
+      } catch (err) {
+        console.error("Error fetching sectors:", err);
+        setSectors(["IT", "Marketing", "Electronics", "Healthcare", "Finance"]); // fallback
+      }
+    }
+    fetchSectors();
+  }, []);
+
+  // Fetch states on mount
+  useEffect(() => {
+    async function fetchStates() {
+      try {
+        const res = await fetch(
+          "https://countriesnow.space/api/v0.1/countries/states",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ country: "India" }),
+          }
+        );
+        const data = await res.json();
+        const stateNames = data.data.states.map((s) => normalizeText(s.name));
+        setStates(uniqueArray(stateNames));
+      } catch (err) {
+        console.error("Error fetching states:", err);
+        setStates(["Tamil Nadu", "Kerala", "Karnataka"]); // fallback
+      }
+    }
+    fetchStates();
+  }, []);
+
+  // Fetch districts when selectedState changes
+  useEffect(() => {
+    if (!selectedState) {
+      setDistricts([]);
+      setSelectedDistricts([]);
+      return;
+    }
+    async function fetchDistricts() {
+      try {
+        const res = await fetch(
+          "https://countriesnow.space/api/v0.1/countries/state/cities",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ country: "India", state: selectedState }),
+          }
+        );
+        const data = await res.json();
+        const districtNames = data.data.map((d) => normalizeText(d));
+        setDistricts(uniqueArray(districtNames));
+      } catch (err) {
+        console.error("Error fetching districts:", err);
+        setDistricts(["Fallback District 1", "Fallback District 2"]); // fallback
+      }
+    }
+    fetchDistricts();
+  }, [selectedState]);
 
   const handleSubmit = () => {
     const newErrors = {
-      internshipType: internshipType === "",
-      location: location === "",
+      sector: sector === "",
+      state: !selectedState,
+      districts: selectedDistricts.length === 0,
     };
     setErrors(newErrors);
+    if (Object.values(newErrors).some(Boolean)) return;
 
-    if (newErrors.internshipType || newErrors.location) return;
-
-    console.log({ internshipType, location });
-    console.log(pointer)
-    if(pointer<=2)
-    setPointer(pointer + 1);
+    console.log({
+      sector,
+      state: selectedState,
+      districts: selectedDistricts,
+    });
+    if (pointer <= 2) setPointer(pointer + 1);
   };
 
   return (
@@ -40,39 +122,73 @@ export default function InternshipDetails({ pointer, setPointer }) {
         Internship Details
       </Typography>
 
-      {/* Internship Type */}
+      {/* Sector selection */}
       <TextField
         select
         fullWidth
-        label="Internship Type *"
-        value={internshipType}
-        onChange={(e) => setInternshipType(e.target.value)}
-        error={errors.internshipType}
-        helperText={errors.internshipType ? "Please select internship type" : ""}
+        label="Sector *"
+        value={sector}
+        onChange={(e) => setSector(e.target.value)}
+        error={errors.sector}
+        helperText={errors.sector ? "Please select sector" : ""}
+        SelectProps={{ native: false }}
       >
-        {internshipTypes.map((type) => (
+        {sectors.map((type) => (
           <MenuItem key={type} value={type}>
             {type}
           </MenuItem>
         ))}
       </TextField>
 
-      {/* Location */}
+      {/* State selection */}
       <TextField
         select
         fullWidth
-        label="Location *"
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
-        error={errors.location}
-        helperText={errors.location ? "Please select a location" : ""}
+        label="Preferred State *"
+        value={selectedState || ""}
+        onChange={(e) => {
+          setSelectedState(e.target.value);
+          setSelectedDistricts([]); // <-- Reset districts when state changes
+        }}
+        error={errors.state}
+        helperText={errors.state ? "Please select a state" : ""}
+        SelectProps={{ native: false }}
       >
-        {locations.map((loc) => (
-          <MenuItem key={loc} value={loc}>
-            {loc}
+        {states.map((state) => (
+          <MenuItem key={state} value={state}>
+            {state}
           </MenuItem>
         ))}
       </TextField>
+
+      {/* Districts selection */}
+      {selectedState && (
+        <Autocomplete
+          multiple
+          options={districts}
+          value={selectedDistricts}
+          onChange={(event, newValue) => {
+            setSelectedDistricts(newValue);
+          }}
+          renderTags={(value, getTagProps) =>
+            value.map((option, index) => {
+              const { key, ...otherTagProps } = getTagProps({ index });
+              return <Chip key={key} label={option} {...otherTagProps} />;
+            })
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              variant="outlined"
+              label="Preferred District(s) *"
+              error={errors.districts}
+              helperText={
+                errors.districts ? "Please select at least one district" : ""
+              }
+            />
+          )}
+        />
+      )}
 
       {/* Buttons */}
       <Buttons pointer={pointer} setPointer={setPointer} handleSubmit={handleSubmit} />

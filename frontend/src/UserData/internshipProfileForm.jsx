@@ -10,16 +10,13 @@ import {
 
 import React from "react";
 import Education from "./education";
-import { Button } from "@mui/material";
 import Skills from "./skills";
 import Perference from "./preference";
 
 export default function InternshipProfileForm() {
-  const data = ["Education", "Skills", "Preference"];
+  const data = ["Education", "Skills", "Internship Details"];
   const length = data.length;
   const [pointer, setPointer] = useState(0);
-
-  // clamp pointer safely
 
   return (
     <div className="flex justify-center mt-16">
@@ -29,13 +26,7 @@ export default function InternshipProfileForm() {
           {data.map((label, index) => (
             <React.Fragment key={index}>
               <div className="flex gap-[10px]">
-                {index < pointer ? (
-                  <TickDotted />
-                ) : index === pointer ? (
-                  <Dotted />
-                ) : (
-                  <Empty />
-                )}
+                {index < pointer ? <TickDotted /> : index === pointer ? <Dotted /> : <Empty />}
 
                 <h3
                   className={`text-[#555555]  ${
@@ -47,13 +38,7 @@ export default function InternshipProfileForm() {
               </div>
 
               {index + 1 !== length &&
-                (index < pointer ? (
-                  <GreenConnect />
-                ) : index === pointer ? (
-                  <Connect />
-                ) : (
-                  <EmptyConnect />
-                ))}
+                (index < pointer ? <GreenConnect /> : index === pointer ? <Connect /> : <EmptyConnect />)}
             </React.Fragment>
           ))}
         </div>
@@ -65,13 +50,15 @@ export default function InternshipProfileForm() {
           p-10 rounded-r-xl w-[600px] 
           h-[600px] overflow-y-scroll"
         >
-          {pointer === 0 ? (
+          <div style={{ display: pointer === 0 ? "block" : "none" }}>
             <Education pointer={pointer} setPointer={setPointer} />
-          ) : pointer === 1 ? (
+          </div>
+          <div style={{ display: pointer === 1 ? "block" : "none" }}>
             <Skills pointer={pointer} setPointer={setPointer} />
-          ) : (
+          </div>
+          <div style={{ display: pointer === 2 ? "block" : "none" }}>
             <Perference pointer={pointer} setPointer={setPointer} />
-          )}
+          </div>
         </div>
       </div>
     </div>

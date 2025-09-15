@@ -26,7 +26,6 @@ const indianLanguages = [
 export default function Skills({ pointer, setPointer }) {
   const [skills, setSkills] = useState([]);
   const [languages, setLanguages] = useState([]);
-  const [certifications, setCertifications] = useState([]);
   const [errors, setErrors] = useState({
     skills: false,
     languages: false,
@@ -34,14 +33,6 @@ export default function Skills({ pointer, setPointer }) {
   });
 
   const handleSubmit = () => {
-    let finalCerts = certifications;
-
-    const inputElement = document.querySelector(
-      'input[placeholder="Certifications *"]'
-    );
-    if (inputElement && inputElement.value.trim() !== "") {
-      finalCerts = [...finalCerts, inputElement.value.trim()];
-    }
 
     if (skills.length === 0) {
       setErrors((prev) => ({ ...prev, skills: true }));
@@ -51,15 +42,11 @@ export default function Skills({ pointer, setPointer }) {
       setErrors((prev) => ({ ...prev, languages: true }));
       return;
     }
-    if (finalCerts.length === 0) {
-      setErrors((prev) => ({ ...prev, certifications: true }));
-      return;
-    }
 
-    setErrors({ skills: false, languages: false, certifications: false });
-    setCertifications(finalCerts);
 
-    console.log({ skills, languages, certifications: finalCerts });
+    setErrors({ skills: false, languages: false });
+
+    console.log({ skills, languages });
     setPointer(pointer + 1);
   };
 
@@ -167,29 +154,6 @@ export default function Skills({ pointer, setPointer }) {
             />
           ))}
         </Box>
-      </Box>
-
-      {/* Certifications Section */}
-      <Box>
-        <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-          Certifications
-        </Typography>
-        <TextField
-          fullWidth
-          variant="outlined"
-          label={
-            <span className="flex items-center gap-2">
-              <FeedSharp />
-              Certifications *
-            </span>
-          }
-          value={certifications}
-          onChange={(e) => setCertifications(e.target.value)}
-          error={errors.certifications}
-          helperText={
-            errors.certifications ? "Please add at least one certification" : ""
-          }
-        />
       </Box>
 
       {/* Buttons */}

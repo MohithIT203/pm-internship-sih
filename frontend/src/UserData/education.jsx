@@ -1,136 +1,102 @@
 import React, { useState } from "react";
-import { SchoolIcon, PercentIcon } from "../assets/icons";
-import { Button, MenuItem, TextField, Typography } from "@mui/material";
+import { SchoolIcon } from "../assets/icons";
+import { MenuItem, TextField, Typography } from "@mui/material";
 import Buttons from "./buttons";
 
 export default function Education({ pointer, setPointer }) {
-  const formAttributes = {
-    educationLevel: {
-      label: "Education Level",
-      name: "educationLevel",
-      icon: <SchoolIcon />,
-      placeholder: "Select your education level",
-      type: "text",
-      errorMessage: "Please select your education level",
-      menuItems: ["High School", "Bachelor's", "Master's", "PhD"],
-    },
-    tenthPercentage: {
-      label: "10th std Percentage",
-      name: "tenthPercentage",
-      icon: <PercentIcon />,
-      placeholder: "Enter your 10th percentage",
-      type: "number",
-      errorMessage: "Please enter 10th std percentage (0-100)",
-      menuItems: [],
-    },
-    twelthPercentage: {
-      label: "12th std Percentage",
-      name: "twelthPercentage",
-      icon: <PercentIcon />,
-      placeholder: "Enter your 12th percentage",
-      type: "number",
-      errorMessage: "Please enter 12th std percentage (0-100)",
-      menuItems: [],
-    },
+  const degree = {
+    "B.Tech / B.E": ["Computer Science", "Mechanical", "Electrical", "Civil", "Electronics", "AI & ML", "IT"],
+    "B.Arch": ["Architecture"],
+    "B.Des": ["Design"],
+    "B.Sc": ["Physics", "Chemistry", "Mathematics", "Biology", "Statistics", "Microbiology", "Biotechnology"],
+    "BCA": ["Computer Applications"],
+    "B.Com": ["Accounting", "Finance", "Economics"],
+    "BBA": ["Business", "Administration", "Management"],
   };
 
-  const [inputs, setInputs] = useState({
-    educationLevel: "",
-    tenthPercentage: "",
-    twelthPercentage: "",
-  });
-
+  const [course, setCourse] = useState("");
+  const [branch, setBranch] = useState("");
   const [errors, setErrors] = useState({
-    educationLevel: false,
-    tenthPercentage: false,
-    twelthPercentage: false,
+    course: false,
+    branch: false,
   });
-
-  const handleInput = (e) => {
-    const { name, value } = e.target;
-    setInputs({ ...inputs, [name]: value });
-
-    // clear error immediately when user types something
-    if (value.trim() !== "") {
-      setErrors((prev) => ({ ...prev, [name]: false }));
-    }
-  };
 
   const handleSubmit = () => {
-  let hasError = false;
-  let newErrors = { ...errors };
+    let newErrors = {
+      course: course === "",
+      branch: branch === "",
+    };
+    setErrors(newErrors);
 
-  Object.keys(inputs).forEach((key) => {
-    const value = inputs[key].trim();
+    if (Object.values(newErrors).some(Boolean)) return;
 
-    // check empty
-    if (value === "") {
-      newErrors[key] = true;
-      hasError = true;
-    } 
-    // check percentage range for 10th and 12th
-    else if (
-      (key === "tenthPercentage" || key === "twelthPercentage") &&
-      (isNaN(value) || value < 0 || value > 100)
-    ) {
-      if(key === "tenthPercentage") {
-        formAttributes.tenthPercentage.errorMessage = "Please enter a valid 10th std percentage (0-100)";
-      }
-      if(key === "twelthPercentage") {
-        formAttributes[key].errorMessage = "Please enter a valid 12th std percentage (0-100)";
-      }
-      newErrors[key] = true;
-      hasError = true;
-    } else {
-      newErrors[key] = false;
-    }
-
-
-  });
-
-  setErrors(newErrors);
-
-  if (!hasError) {
-    console.log(inputs);
-    setPointer(pointer + 1); // only move next when no errors
-  }
-};
-
+    console.log({ course, branch });
+    setPointer(pointer + 1);
+  };
 
   return (
-    <form className="flex flex-col gap-10 ">
-      {Object.values(formAttributes).map((field, index) => (
-        <div key={index} className="flex flex-col items-start gap-2">
-          <Typography>{field.label}</Typography>
-          <TextField
-            label={
-              <span className="flex items-center gap-5 ">
-                {field.icon}
-                {field.placeholder}
-              </span>
-            }
-            type={field.type}
-            name={field.name}
-            error={errors[field.name]}
-            select={field.menuItems.length > 0}
-            value={inputs[field.name]}
-            helperText={
-              errors[field.name] ? [field.errorMessage] : null
-            }
-            onChange={handleInput}
-            fullWidth
-          >
-            {field.menuItems.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </TextField>
-        </div>
-      ))}
+    <form className="flex flex-col gap-10">
+      {/* Course Dropdown */}
+      <div className="flex flex-col items-start gap-2">
+        <Typography>Course</Typography>
+        <TextField
+          select
+          fullWidth
+          label={
+            <span className="flex items-center gap-5">
+              <SchoolIcon /> Select your course
+            </span>
+          }
+          value={course}
+          onChange={(e) => {
+            setCourse(e.target.value);
+            setBranch(""); // Reset branch when course changes
+            setErrors((prev) => ({ ...prev, course: false, branch: false }));
+          }}
+          error={errors.course}
+          helperText={errors.course ? "Please select your course" : ""}
+        >
+          {Object.keys(degree).map((deg) => (
+            <MenuItem key={deg} value={deg}>
+              {deg}
+            </MenuItem>
+          ))}
+        </TextField>
+      </div>
 
-            <Buttons pointer={pointer} setPointer={setPointer} handleSubmit={handleSubmit} />
-      
+      {/* Branch Dropdown */}
+      <div className="flex flex-col items-start gap-2">
+        <Typography>Branch</Typography>
+       <TextField
+  select
+  fullWidth
+  label={
+    <span className="flex items-center gap-5">
+      <SchoolIcon /> Select your branch
+    </span>
+  }
+  value={branch}
+  onChange={(e) => {
+    setBranch(e.target.value);
+    setErrors((prev) => ({ ...prev, branch: false }));
+  }}
+  error={errors.branch}
+  helperText={errors.branch ? "Please select your branch" : ""}
+  disabled={!course}
+>
+  {course
+    ? degree[course].map((b) => (
+        <MenuItem key={b} value={b}>
+          {b}
+        </MenuItem>
+      ))
+    : [<MenuItem key="empty" value="">Select a course first</MenuItem>]}
+</TextField>
+
+      </div>
+
+      {/* Buttons */}
+      <Buttons pointer={pointer} setPointer={setPointer} handleSubmit={handleSubmit} />
     </form>
   );
 }
