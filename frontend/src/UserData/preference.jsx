@@ -38,7 +38,13 @@ export default function Preference({ pointer, setPointer, inputs, setInputs }) {
     async function fetchSectors() {
       try {
         // Using a static array for demonstration (you can replace with a working API)
-        const sectorNames = ["IT", "Marketing", "Electronics", "Healthcare", "Finance"];
+        const sectorNames = [
+          "IT",
+          "Marketing",
+          "Electronics",
+          "Healthcare",
+          "Finance",
+        ];
         setSectors(uniqueArray(sectorNames));
       } catch (err) {
         console.error("Error fetching sectors:", err);
@@ -70,7 +76,7 @@ export default function Preference({ pointer, setPointer, inputs, setInputs }) {
     }
     fetchStates();
   }, []);
-
+  
   // Fetch districts when selectedState changes
   useEffect(() => {
     if (!selectedState) {
@@ -98,39 +104,35 @@ export default function Preference({ pointer, setPointer, inputs, setInputs }) {
     }
     fetchDistricts();
   }, [selectedState]);
-
+  
+    useEffect(() => {
+      setInputs((prev) => ({
+        ...prev,
+        sector: sector,
+        state: selectedState,
+        districts: selectedDistricts,
+      }));
+    }, [sector, selectedState, selectedDistricts, setInputs]);
+  
   const handleSubmit = () => {
-  const newErrors = {
-    sector: sector === "",
-    state: !selectedState,
-    districts: selectedDistricts.length === 0,
+    const newErrors = {
+      sector: sector === "",
+      state: !selectedState,
+      districts: selectedDistricts.length === 0,
+    };
+    setErrors(newErrors);
+    if (Object.values(newErrors).some(Boolean)) return;
+
+    
+    console.log({ sector, state: selectedState, districts: selectedDistricts });
+    console.log(inputs);
+    if (pointer <= 2) setPointer(pointer + 1);
   };
-  setErrors(newErrors);
-  if (Object.values(newErrors).some(Boolean)) return;
-
-  // prepare new data
-  const newData = {
-    sector,
-    state: selectedState,
-    districts: selectedDistricts,
-  };
-
-  // update parent state
-  setInputs((prev) => ({
-    ...prev,
-    ...newData,
-  }));
-
-  // ✅ log immediately without waiting for state
-  console.log("Submitted:", inputs);
-
-  // move pointer
-  if (pointer <= 2) setPointer(pointer + 1);
-};
-
 
   return (
-    <Box sx={{ maxWidth: 600, display: "flex", flexDirection: "column", gap: 4 }}>
+    <Box
+      sx={{ maxWidth: 600, display: "flex", flexDirection: "column", gap: 4 }}
+    >
       <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
         Internship Details
       </Typography>
@@ -141,11 +143,14 @@ export default function Preference({ pointer, setPointer, inputs, setInputs }) {
         fullWidth
         label="Sector *"
         value={sector}
-        onChange={(e) => setSector(e.target.value)}
+        onChange={(e) => {
+          setSector(e.target.value);
+        }}
         error={errors.sector}
         helperText={errors.sector ? "Please select sector" : ""}
         SelectProps={{ native: false }}
-      >
+        
+        >
         {sectors.map((type) => (
           <MenuItem key={type} value={type}>
             {type}
@@ -161,7 +166,7 @@ export default function Preference({ pointer, setPointer, inputs, setInputs }) {
         value={selectedState || ""}
         onChange={(e) => {
           setSelectedState(e.target.value);
-          setSelectedDistricts([]); // <-- Reset districts when state changes
+          setSelectedDistricts([]); 
         }}
         error={errors.state}
         helperText={errors.state ? "Please select a state" : ""}
@@ -204,7 +209,11 @@ export default function Preference({ pointer, setPointer, inputs, setInputs }) {
       )}
 
       {/* Buttons */}
-      <Buttons pointer={pointer} setPointer={setPointer} handleSubmit={handleSubmit} />
+      <Buttons
+        pointer={pointer}
+        setPointer={setPointer}
+        handleSubmit={handleSubmit}
+      />
     </Box>
   );
 }

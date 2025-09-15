@@ -59,7 +59,7 @@ export default function InternshipProfileForm() {
           id="components"
           className="bg-gradient-to-b from-[#D8DFFE] to-[#FCE6CB] 
           p-10 rounded-r-xl w-[600px] 
-          h-[600px] overflow-y-scroll"
+          h-[600px] overflow-y-scroll border-l border-gray-300"
         >
           <div style={{ display: pointer === 0 ? "block" : "none" }}>
             <Education pointer={pointer} setPointer={setPointer} inputs={inputs} setInputs={setInputs} />
