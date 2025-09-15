@@ -20,11 +20,11 @@ function uniqueArray(arr) {
   return [...new Set((arr || []).filter(Boolean))];
 }
 
-export default function Preference({ pointer, setPointer }) {
+export default function Preference({ pointer, setPointer, inputs, setInputs }) {
   const [sector, setSector] = useState("");
   const [sectors, setSectors] = useState([]);
   const [states, setStates] = useState([]);
-  const [selectedState, setSelectedState] = useState(null);
+  const [selectedState, setSelectedState] = useState("");
   const [districts, setDistricts] = useState([]);
   const [selectedDistricts, setSelectedDistricts] = useState([]);
   const [errors, setErrors] = useState({
@@ -100,21 +100,34 @@ export default function Preference({ pointer, setPointer }) {
   }, [selectedState]);
 
   const handleSubmit = () => {
-    const newErrors = {
-      sector: sector === "",
-      state: !selectedState,
-      districts: selectedDistricts.length === 0,
-    };
-    setErrors(newErrors);
-    if (Object.values(newErrors).some(Boolean)) return;
-
-    console.log({
-      sector,
-      state: selectedState,
-      districts: selectedDistricts,
-    });
-    if (pointer <= 2) setPointer(pointer + 1);
+  const newErrors = {
+    sector: sector === "",
+    state: !selectedState,
+    districts: selectedDistricts.length === 0,
   };
+  setErrors(newErrors);
+  if (Object.values(newErrors).some(Boolean)) return;
+
+  // prepare new data
+  const newData = {
+    sector,
+    state: selectedState,
+    districts: selectedDistricts,
+  };
+
+  // update parent state
+  setInputs((prev) => ({
+    ...prev,
+    ...newData,
+  }));
+
+  // ✅ log immediately without waiting for state
+  console.log("Submitted:", inputs);
+
+  // move pointer
+  if (pointer <= 2) setPointer(pointer + 1);
+};
+
 
   return (
     <Box sx={{ maxWidth: 600, display: "flex", flexDirection: "column", gap: 4 }}>

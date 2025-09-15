@@ -14,6 +14,17 @@ import Skills from "./skills";
 import Perference from "./preference";
 
 export default function InternshipProfileForm() {
+
+  const [inputs,setInputs] = useState({
+      course : "",
+      branch : "",
+      skills : [],
+      languages : [],
+      sector : "",
+      state : "",
+      districts : []
+  })
+
   const data = ["Education", "Skills", "Internship Details"];
   const length = data.length;
   const [pointer, setPointer] = useState(0);
@@ -51,13 +62,13 @@ export default function InternshipProfileForm() {
           h-[600px] overflow-y-scroll"
         >
           <div style={{ display: pointer === 0 ? "block" : "none" }}>
-            <Education pointer={pointer} setPointer={setPointer} />
+            <Education pointer={pointer} setPointer={setPointer} inputs={inputs} setInputs={setInputs} />
           </div>
           <div style={{ display: pointer === 1 ? "block" : "none" }}>
-            <Skills pointer={pointer} setPointer={setPointer} />
+            <Skills pointer={pointer} setPointer={setPointer} inputs={inputs} setInputs={setInputs} />
           </div>
-          <div style={{ display: pointer === 2 ? "block" : "none" }}>
-            <Perference pointer={pointer} setPointer={setPointer} />
+          <div style={{ display: pointer === 2 ||  pointer === 3  ? "block" : "none" }}>
+            <Perference pointer={pointer} setPointer={setPointer} inputs={inputs} setInputs={setInputs} />
           </div>
         </div>
       </div>

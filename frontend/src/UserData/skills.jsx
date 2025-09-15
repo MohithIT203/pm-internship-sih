@@ -23,7 +23,7 @@ const indianLanguages = [
   "Manipuri", "Dogri", "Bodo", "Sanskrit"
 ];
 
-export default function Skills({ pointer, setPointer }) {
+export default function Skills({ pointer, setPointer, inputs, setInputs }) {
   const [skills, setSkills] = useState([]);
   const [languages, setLanguages] = useState([]);
   const [errors, setErrors] = useState({
@@ -46,7 +46,16 @@ export default function Skills({ pointer, setPointer }) {
 
     setErrors({ skills: false, languages: false });
 
+    setInputs((prev) => ({
+      ...prev,
+      skills: skills,  
+      languages: languages 
+    }));
+
     console.log({ skills, languages });
+
+    // console.log(inputs)
+
     setPointer(pointer + 1);
   };
 
